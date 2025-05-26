@@ -41,5 +41,7 @@ public class Hospital {
     }
 
     public void update(PatientUpdateRequestDto patientUpdateRequestDto) {
+        this.name = hospitalUpdateRequestDto.name();
+        this.age = hospitalUpdateRequestDto.age();
     }
 }
