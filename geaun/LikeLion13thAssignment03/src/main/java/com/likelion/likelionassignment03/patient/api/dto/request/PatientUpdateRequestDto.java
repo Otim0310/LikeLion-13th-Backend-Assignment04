@@ -5,9 +5,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 
 public record PatientUpdateRequestDto(
-        @NotEmpty(message = "수정값이 공백이어서는 안 됩니다.")
+        @NotBlank(message = "원인을 필수로 입력해야 합니다.")
+        @Positive(message = "나이는 양수여야 합니다")
         String causes,
-        @PositiveOrZero(message = "나이는 0보다 많아야 합니다.")
+        @NotNull(message = "나이를 필수로 입력해야 합니다.")
         @NotNull(message = "수정값이 공백이어서는 안 됩니다.")
         int age
 ) {
