@@ -1,12 +1,12 @@
 package com.likelion.likelionassignment03.patient.api;
 
+import com.likelion.likelionassignment03.common.response.ApiResTemplate;
 import com.likelion.likelionassignment03.patient.api.dto.request.PatientSaveRequestDto;
 import com.likelion.likelionassignment03.patient.api.dto.request.PatientUpdateRequestDto;
 import com.likelion.likelionassignment03.patient.api.dto.response.PatientListResponseDto;
 import com.likelion.likelionassignment03.patient.application.PatientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,29 +18,34 @@ public class PatientController {
     private final PatientService patientService;
 
     @PostMapping("/save")
-    public ResponseEntity<String> patientSave(@RequestBody @Valid PatientSaveRequestDto patientSaveRequestDto) {
-        patientService.patientSave(patientSaveRequestDto);
-        return new ResponseEntity<>("환자 저장!", HttpStatus.CREATED);
+    public ResponseEntity<ApiResTemplate<String>> savePatient(@RequestBody @Valid PatientSaveRequestDto requestDto) {
+        patientService.savePatient(requestDto);
+        return ResponseEntity.status(201)
+                .body(ApiResTemplate.success("환자 저장 성공"));
     }
 
     @GetMapping("/{hospitalId}")
-    public ResponseEntity<PatientListResponseDto> myPatientFindAll(@PathVariable("hospitalId") Long hospitalId) {
-        PatientListResponseDto patientListResponseDto = patientService.patientFindHospital(hospitalId);
-        return new ResponseEntity<>(patientListResponseDto, HttpStatus.OK);
+    public ResponseEntity<ApiResTemplate<PatientListResponseDto>> getPatientsByHospital(
+            @PathVariable("hospitalId") Long hospitalId) {
+        PatientListResponseDto responseDto = patientService.getPatientsByHospitalId(hospitalId);
+        return ResponseEntity.ok(ApiResTemplate.success("환자 목록 조회 성공", responseDto));
     }
 
     @PatchMapping("/{patientId}")
-    public ResponseEntity<String> patientUpdate(
+    public ResponseEntity<ApiResTemplate<String>> updatePatient(
             @PathVariable("patientId") Long patientId,
-            @RequestBody PatientUpdateRequestDto patientUPdateRequestDto) {
-        patientService.patientUpdate(patientId, patientUPdateRequestDto);
-        return new ResponseEntity<>("환자 수정", HttpStatus.OK);
+            @RequestBody PatientUpdateRequestDto requestDto) {
+        patientService.updatePatient(patientId, requestDto);
+        return ResponseEntity.ok(ApiResTemplate.success("환자 수정 성공"));
     }
 
     @DeleteMapping("/{patientId}")
-    public ResponseEntity<String> patientDelete(@PathVariable("patientId") Long patientId) {
-        patientService.patientDelete(patientId);
-        return new ResponseEntity<>("환자 삭제", HttpStatus.OK);
+    public ResponseEntity<ApiResTemplate<String>> deletePatient(@PathVariable("patientId") Long patientId) {
+        patientService.deletePatient(patientId);
+        return ResponseEntity.ok(ApiResTemplate.success("환자 삭제 성공"));
+    }
+}
+
     }
 }
 
