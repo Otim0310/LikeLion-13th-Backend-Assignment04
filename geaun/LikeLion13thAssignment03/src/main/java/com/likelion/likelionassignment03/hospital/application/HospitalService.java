@@ -8,7 +8,8 @@ import com.likelion.likelionassignment03.hospital.api.dto.response.HospitalInfoR
 import com.likelion.likelionassignment03.hospital.api.dto.response.HospitalListResponseDto;
 import com.likelion.likelionassignment03.hospital.domain.Hospital;
 import com.likelion.likelionassignment03.hospital.domain.repository.HospitalRepository;
-import com.likelion.likelionassignment03.patient.api.dto.request.PatientUpdateRequestDto;
+import com.likelion.likelionassignment03.common.error.ErrorCode;
+import com.likelion.likelionassignment03.common.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,7 @@ public class HospitalService {
     public void saveHospital(HospitalSaveRequestDto requestDto) {
         Hospital hospital = Hospital.builder()
                 .name(requestDto.name())
-                .establishedYears(requestDto.establishedYears()) // camelCase 사용
+                .establishedYears(requestDto.establishedYears())
                 .location(requestDto.location())
                 .build();
         hospitalRepository.save(hospital);
@@ -43,23 +44,33 @@ public class HospitalService {
     public HospitalInfoResponseDto getHospitalById(Long hospitalId) {
         Hospital hospital = hospitalRepository
                 .findById(hospitalId)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.HOSPITAL_NOT_FOUND,
+                        ErrorCode.HOSPITAL_NOT_FOUND.getMessage() + " ID: " + hospitalId));
         return HospitalInfoResponseDto.from(hospital);
     }
 
     @Transactional
-    public void hospitalUpdate(Long hospitalId,
-                               PatientUpdateRequestDto patientUpdateRequestDto) {
-        Hospital hospital = hospitalRepository.findById(hospitalId)
-                .orElseThrow(IllegalArgumentException::new);
-
-        hospital.update(patientUpdateRequestDto);
+    public void hospitalUpdate(Long hospitalId, HospitalUpdateRequestDto updateRequestDto) {
+        Hospital hospital = hospitalRepository
+                .findById(hospitalId)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.HOSPITAL_NOT_FOUND,
+                        ErrorCode.HOSPITAL_NOT_FOUND.getMessage() + " ID: " + hospitalId));
+        hospital.update(updateRequestDto);
     }
 
     @Transactional
     public void hospitalDelete(Long hospitalId) {
-        Hospital hospital = hospitalRepository.findById(hospitalId)
-                .orElseThrow(IllegalArgumentException::new);
+        Hospital hospital = hospitalRepository
+                .findById(hospitalId)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.HOSPITAL_NOT_FOUND,
+                        ErrorCode.HOSPITAL_NOT_FOUND.getMessage() + " ID: " + hospitalId));
+        hospitalRepository.delete(hospital);
+    }
+}
+
 
         hospitalRepository.delete(hospital);
 
