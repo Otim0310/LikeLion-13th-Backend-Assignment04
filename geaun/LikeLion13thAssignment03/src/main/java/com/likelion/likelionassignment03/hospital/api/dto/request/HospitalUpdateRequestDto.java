@@ -6,11 +6,12 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
 public record HospitalUpdateRequestDto(
-        @NotEmpty(message = "수정값이 공백이어서는 안 됩니다.")
+        @NotBlank(message = "병원 이름은 필수입니다.")
+        @Size(min = 2, max = 30, message = "병원 이름은 2자 이상 30자 이하여야 합니다.")
         String name,
-        @NotNull(message = "수정값이 공백이어서는 안 됩니다.")
+        @NotNull(message = "병원 위치 정보는 필수입니다.")
         String location
 ) {
 }
 
-
+      
