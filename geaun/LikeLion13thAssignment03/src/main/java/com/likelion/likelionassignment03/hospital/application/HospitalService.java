@@ -62,8 +62,6 @@ public class HospitalService {
                 .orElseThrow(IllegalArgumentException::new);
 
         hospitalRepository.delete(hospital);
-    }
 
-    public void hospitalUpdate(Long hospitalId, HospitalUpdateRequestDto hospitalUpdateRequestDto) {
     }
 }
