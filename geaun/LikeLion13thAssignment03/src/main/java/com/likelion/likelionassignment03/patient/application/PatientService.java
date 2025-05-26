@@ -1,5 +1,7 @@
 package com.likelion.likelionassignment03.patient.application;
 
+import com.likelion.likelionassignment03.exception.BusinessException;
+import com.likelion.likelionassignment03.exception.ErrorCode;
 import com.likelion.likelionassignment03.hospital.domain.Hospital;
 import com.likelion.likelionassignment03.hospital.domain.repository.HospitalRepository;
 import com.likelion.likelionassignment03.patient.api.dto.request.PatientUpdateRequestDto;
@@ -23,9 +25,9 @@ public class PatientService {
     private final PatientRepository patientRepository;
 
     @Transactional
-    public void patientSave(PatientSaveRequestDto patientSaveRequestDto) {
+    public void savePatient(PatientSaveRequestDto patientSaveRequestDto) {
         Hospital hospital = hospitalRepository.findById(patientSaveRequestDto.hospitalId())
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.HOSPITAL_NOT_FOUND_EXCEPTION));
 
         Patient patient = Patient.builder()
                 .age(patientSaveRequestDto.age())
@@ -36,9 +38,9 @@ public class PatientService {
         patientRepository.save(patient);
     }
 
-    public PatientListResponseDto patientFindHospital(Long hospitalId) {
+    public PatientListResponseDto getPatientsByHospital(Long hospitalId) {
         Hospital hospital = hospitalRepository.findById(hospitalId)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.HOSPITAL_NOT_FOUND_EXCEPTION));
 
         List<Patient> patients = patientRepository.findByHospital(hospital);
         List<PatientInfoResponseDto> patientInfoResponseDtos = patients.stream()
@@ -48,20 +50,27 @@ public class PatientService {
         return PatientListResponseDto.from(patientInfoResponseDtos);
     }
 
-    @Transactional
-    public void patientUpdate(Long patientId,
-                              PatientUpdateRequestDto patientUpdateRequestDto) {
+    public PatientInfoResponseDto findPatientById(Long patientId) {
         Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.PATIENT_NOT_FOUND_EXCEPTION));
+
+        return PatientInfoResponseDto.from(patient);
+    }
+
+    @Transactional
+    public void updatePatient(Long patientId, PatientUpdateRequestDto patientUpdateRequestDto) {
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PATIENT_NOT_FOUND_EXCEPTION));
 
         patient.update(patientUpdateRequestDto);
     }
 
     @Transactional
-    public void patientDelete(Long patientId) {
+    public void deletePatient(Long patientId) {
         Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.PATIENT_NOT_FOUND_EXCEPTION));
 
         patientRepository.delete(patient);
     }
 }
+
